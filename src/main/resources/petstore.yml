@@ -1,0 +1,194 @@
+openapi: 3.0.2
+info:
+  title: Basic spring
+  version: 1.0.0
+  description: Projeto que servira de base para futuros projetos
+  contact:
+    name: Basic API
+    email: jian_kowalski@com.br
+servers:
+  - url: localhost:8080/v3/api-docs
+paths:
+  /pets:
+    get:
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PetModel'
+              examples:
+                laurent_cats:
+                  value:
+                    - id: 1
+                      name: Zaza
+                      tag: cat
+                    - id: 2
+                      name: Tigresse
+                      tag: cat
+                    - id: 3
+                      name: Maki
+                      tag: cat
+                    - id: 4
+                      name: Toufik
+                      tag: cat
+          description: pet response
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+          description: unexpected error
+      operationId: findPets
+      description: |
+        Returns all pets from the system that the user has access to
+    post:
+      requestBody:
+        description: Pet to add to the store
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PetInput'
+            examples:
+              tigresse:
+                value:
+                  name: Tigresse
+                  tag: cat
+        required: true
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PetModel'
+              examples:
+                tigresse:
+                  value:
+                    id: 2
+                    name: Tigresse
+                    tag: cat
+          description: pet response
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+          description: unexpected error
+      operationId: addPet
+      description: Creates a new pet in the store.  Duplicates are allowed
+  /pets/{id}:
+    get:
+      parameters:
+        - name: id
+          description: ID of pet to fetch
+          schema:
+            format: int64
+            type: integer
+          in: path
+          required: true
+          examples:
+            zaza:
+              value: 1
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PetModel'
+              examples:
+                zaza:
+                  value:
+                    id: 1
+                    name: Zaza
+                    tag: cat
+          description: pet response
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+          description: unexpected error
+      operationId: findPetById
+      description: |-
+        Returns a user based on a single ID, if the user does not have
+        access to the pet
+    delete:
+      parameters:
+        - name: id
+          description: ID of pet to delete
+          schema:
+            format: int64
+            type: integer
+          in: path
+          required: true
+      responses:
+        "204":
+          description: pet deleted
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+          description: unexpected error
+      operationId: deletePet
+      description: deletes a single pet based on the ID supplied
+    parameters:
+      - name: id
+        description: Pet identifier
+        schema:
+          type: integer
+        in: path
+        required: true
+components:
+  schemas:
+    PetModel:
+      allOf:
+        - $ref: '#/components/schemas/PetInput'
+        - required:
+            - id
+          properties:
+            id:
+              format: int64
+              type: integer
+    PetInput:
+      required:
+        - name
+        - tag
+      properties:
+        name:
+          type: string
+          minLength: 3
+          maxLength: 255
+        tag:
+          type: string
+          minLength: 5
+          maxLength: 255
+    Object:
+      properties:
+        name:
+          type: string
+        userMessage:
+          type: string
+    Problem:
+      properties:
+        status:
+          format: int32
+          type: integer
+        timestamp:
+          type: string
+          format: date-time
+        type:
+          type: string
+        title:
+          type: string
+        detail:
+          type: string
+        userMessage:
+          type: string
+        objects:
+          type: array
+          items:
+            $ref: '#/components/schemas/Object'
+

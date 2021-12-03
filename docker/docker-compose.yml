@@ -1,0 +1,18 @@
+version: "3.6"
+services:
+  mysql:
+    image: mysql/mysql-server:8.0.25
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: pets
+      MYSQL_USER: pets
+      MYSQL_PASSWORD: pets
+    ports:
+      - 3306:3306
+
+  basic-spring:
+    image: basic-spring:0.1
+    ports:
+      - 8080:8080
+    depends_on:
+      - mysql
